@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:infinispan:config:10.1 https://infinispan.org/schemas/infinispan-config-10.1.xsd
+                            urn:infinispan:server:10.1 https://infinispan.org/schemas/infinispan-server-10.1.xsd"
+            xmlns="urn:infinispan:config:10.1"
+            xmlns:server="urn:infinispan:server:10.1">
+
+    <jgroups>
+        <stack name="relay-global" extends="tcp">
+            <TCPPING initial_hosts="127.0.0.1[7700]"
+                     stack.combine="REPLACE"
+                     stack.position="MPING"/>
+        </stack>
+        <stack name="xsite" extends="udp">
+            <relay.RELAY2 site="RJO" xmlns="urn:org:jgroups"
+                          max_site_masters="10"
+                          can_become_site_master="true"/>
+            <remote-sites default-stack="relay-global">
+                <remote-site name="RJO"/>
+                <remote-site name="SNE"/>
+            </remote-sites>
+        </stack>
+    </jgroups>
+
+    <cache-container name="default" statistics="true">
+        <!-- Uses "my-stack" for cluster transport. -->
+        <transport cluster="${infinispan.cluster.name:relay-global}"
+                   stack="xsite"
+                   node-name="${infinispan.node.name:}"/>
+        <replicated-cache name="Samples" mode="SYNC">
+            <partition-handling when-split="ALLOW_READ_WRITES" merge-policy="NONE"/>
+            <backups>
+                <backup site="SNE"
+                        strategy="ASYNC" />
+            </backups>
+        </replicated-cache>
+    </cache-container>
+</infinispan>

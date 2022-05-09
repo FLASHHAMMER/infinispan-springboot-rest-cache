@@ -1,0 +1,38 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.7'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.cache'
+version = '0.0.1'
+description = 'infinispan-springboot-rest-cache'
+java.sourceCompatibility = '1.8'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/milestone'
+        metadataSources {
+            artifact() //Look directly for artifact
+        }
+    }
+    maven {
+        url 'https://repo.spring.io/snapshot'
+        metadataSources {
+            artifact() //Look directly for artifact
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.infinispan:infinispan-spring-boot-starter-embedded'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
